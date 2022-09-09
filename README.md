@@ -12,6 +12,6 @@ This repo contains the code associated with the paper 'A role for systems alignm
 ```
 
 ## Usage
-Data associated with this paper is available on OSF. To use the functions and scripts in this repo, download the `assets` and `results` folders from OSF here.
+Data associated with this paper is available on OSF. To use the functions and scripts in this repo, download the `assets` and `results` folders from OSF, and save them to the root directory.
 
 
