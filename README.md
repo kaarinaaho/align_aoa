@@ -1,6 +1,7 @@
 # align_aoa
 
-This repo contains the code associated with the paper 'A role for systems alignment in early concept learning', by Kaarina Aho, Brett D. Roads and Bradley C. Love.
+This repo contains the code associated with the paper 'Signatures of cross-modal alignment in children’s
+early concepts', by Kaarina Aho, Brett D. Roads and Bradley C. Love.
 
 ```
 .
@@ -12,6 +13,6 @@ This repo contains the code associated with the paper 'A role for systems alignm
 ```
 
 ## Usage
-Data associated with this paper is available on OSF. To use the functions and scripts in this repo, download the `assets` and `results` folders from OSF, and save them to the root directory.
+Data associated with this paper is available <a href="https://osf.io/32jtv/">on OSF</a>. To use the functions and scripts in this repo, download the `assets` and `results` folders from OSF, and save them to the root directory.
 
 
