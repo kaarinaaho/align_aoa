@@ -6,18 +6,21 @@ library(apaTables)
 library(MBESS)
 library(rstudioapi)
 
-
 # Import filtered data: ----------------------------------------------------------#
 current_path = rstudioapi::getActiveDocumentContext()$path 
+print(dirname(dirname(current_path)))
 setwd(dirname(dirname(current_path)))
 wd <- getwd()
-data <- as.data.frame(read.csv("./results/probe_pair/probe_pair_emp.csv",
+#data <- as.data.frame(read.csv("./results/probe_pair/ppexp_childes.csv",
+#data <- as.data.frame(read.csv("./results/probe_pair/probe_pair_emp.csv",
+data <- as.data.frame(read.csv("./results/probe_pair/ppexp_enwiki8.csv",
                                header=TRUE,
                                stringsAsFactors = TRUE)
 )
 data <- data %>%
         filter(given %in% c("AoA", "controlIncAoA")) %>%
-        filter(month <= 24)
+        filter(month <= 24) %>%
+        filter(pid < 100)
 
 
 # Expt 1: Forced choice, AoA vs control-------------------------------------------#
@@ -26,7 +29,7 @@ data$correct_choice <- as.logical(data$correct_choice)
 monthwise_perf <- data %>%
                   group_by(given, probe, n_given, pid) %>%
                   summarise(correct_choice = mean(correct_choice))
-                  monthwise_perf$n_given <- as.factor(monthwise_perf$n_given)
+monthwise_perf$n_given <- as.factor(monthwise_perf$n_given)
 
 # One-sample t-tests for performance relative to chance (Table S1) ---------------#
 n_givens <- list()
@@ -57,12 +60,12 @@ rm.anova.acc.ez <- ezANOVA(
   data=monthwise_perf,
   dv=.(correct_choice),
   wid=.(pid),
-  within=.(n_given),
-  between=.(given, probe),
+  within=.(n_given, probe),
+  between=.(given),
   type=2
   )
 
-apa.ezANOVA.table(rm.anova.acc.ez, correction="none") # Results table - accuracy
+#apa.ezANOVA.table(rm.anova.acc.ez, correction="none") # Results table - accuracy
 
 loweretasquared <- c()
 upperetasquared <- c()

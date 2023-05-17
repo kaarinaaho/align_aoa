@@ -159,6 +159,9 @@ def get_stripped_varnames(df, strip=["modality"]):
         agnostic = list(set([x.replace("wd_", "").replace("img_", "")
                     for x in df.columns
                     if x not in ["condition", "month", "pid", "thresh", "distance"]]))
+        agnostic = list(set([x.replace("_1", "").replace("_2", "")
+                    for x in df.columns
+                    if x not in ["condition", "month", "pid", "thresh", "distance"]]))
         agnostic = [x for x in agnostic if x not in ["x", "y"]]
         agnostic.sort()
         

@@ -290,6 +290,14 @@ def weighted_alignment_correlation_nontf(pairwiseA, pairwiseB, w, f=None):
 
     return r_s
 
+
+def scale_array(a, newmin, newmax):
+
+    newrng = newmax-newmin
+    a = ((a-np.amin(a, axis=0))/(np.amax(a, axis=0)-np.amin(a, axis=0)) * newrng) + newmin
+
+    return a
+
 """
 @tf.function
 def get_rank(y):

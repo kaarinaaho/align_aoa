@@ -132,3 +132,5 @@ dmypy.json
 *.png
 assets/
 results/
+Untitled.ipynb
+python/Analysis_notebook_CHILDES.ipynb
