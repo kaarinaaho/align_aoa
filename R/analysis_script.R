@@ -12,23 +12,23 @@ print(dirname(dirname(current_path)))
 setwd(dirname(dirname(current_path)))
 wd <- getwd()
 #data <- as.data.frame(read.csv("./results/probe_pair/ppexp_childes.csv",
-#data <- as.data.frame(read.csv("./results/probe_pair/probe_pair_emp.csv",
-data <- as.data.frame(read.csv("./results/probe_pair/ppexp_enwiki8.csv",
+data <- as.data.frame(read.csv("./results/probe_pair/probe_pair_emp.csv",
+                               #data <- as.data.frame(read.csv("./results/probe_pair/ppexp_enwiki8.csv",
                                header=TRUE,
                                stringsAsFactors = TRUE)
 )
 data <- data %>%
-        filter(given %in% c("AoA", "controlIncAoA")) %>%
-        filter(month <= 24) %>%
-        filter(pid < 100)
+  filter(given %in% c("AoA", "controlIncAoA")) %>%
+  filter(month <= 24) %>%
+  filter(pid < 100)
 
 
 # Expt 1: Forced choice, AoA vs control-------------------------------------------#
 data$pid <- paste(data$pid, data$given)
 data$correct_choice <- as.logical(data$correct_choice)
 monthwise_perf <- data %>%
-                  group_by(given, probe, n_given, pid) %>%
-                  summarise(correct_choice = mean(correct_choice))
+  group_by(given, probe, n_given, pid) %>%
+  summarise(correct_choice = mean(correct_choice))
 monthwise_perf$n_given <- as.factor(monthwise_perf$n_given)
 
 # One-sample t-tests for performance relative to chance (Table S1) ---------------#
@@ -41,8 +41,8 @@ ci_ctrl_hi <- list()
 
 for (n in unique(monthwise_perf$n_given)){
   mth_ctrl <- monthwise_perf %>%
-              filter(n_given == n) %>%
-              filter(given == "AoA")
+    filter(n_given == n) %>%
+    filter(given == "AoA")
   
   t_t_ctrl <- t.test(mth_ctrl$correct_choice, mu=0.5)
   n_givens <- append(n_givens, n)
@@ -52,7 +52,28 @@ for (n in unique(monthwise_perf$n_given)){
   ci_ctrl_hi <- append(ci_ctrl_hi, t_t_ctrl$conf.int[2])
 }
 
-df <- as.data.frame(cbind(n_givens, p_ctrl, t_ctrl, ci_ctrl_lo, ci_ctrl_hi))
+df_aoa <- as.data.frame(cbind(n_givens, p_ctrl, t_ctrl, ci_ctrl_lo, ci_ctrl_hi))
+
+n_givens <- list()
+p_ctrl <- list()
+t_ctrl <- list()
+ci_ctrl_lo <- list()
+ci_ctrl_hi <- list()
+for (n in unique(monthwise_perf$n_given)){
+  mth_ctrl <- monthwise_perf %>%
+    filter(n_given == n) %>%
+    filter(given == "controlIncAoA")
+  
+  t_t_ctrl <- t.test(mth_ctrl$correct_choice, mu=0.5)
+  n_givens <- append(n_givens, n)
+  p_ctrl <- append(p_ctrl, t_t_ctrl$p.value)
+  t_ctrl <- append(t_ctrl, t_t_ctrl$statistic)
+  ci_ctrl_lo <- append(ci_ctrl_lo, t_t_ctrl$conf.int[1])
+  ci_ctrl_hi <- append(ci_ctrl_hi, t_t_ctrl$conf.int[2])
+}
+
+df_control <- as.data.frame(cbind(n_givens, p_ctrl, t_ctrl, ci_ctrl_lo, ci_ctrl_hi))
+
 
 
 # Repeated measures ANOVA - accuracy (Table S2) ---------------------------------#
@@ -63,7 +84,7 @@ rm.anova.acc.ez <- ezANOVA(
   within=.(n_given, probe),
   between=.(given),
   type=2
-  )
+)
 
 #apa.ezANOVA.table(rm.anova.acc.ez, correction="none") # Results table - accuracy
 
@@ -97,20 +118,20 @@ print(rm.anova.acc.ez$ANOVA)
 # Expt 2: Forced choice results including generative models----------------------#
 
 data2 <- as.data.frame(read.csv(
-    "./results/probe_pair/probe_pair_optimal.csv",
-     header=TRUE,
-     stringsAsFactors = TRUE))
+  "./results/probe_pair/probe_pair_optimal.csv",
+  header=TRUE,
+  stringsAsFactors = TRUE))
 
 data3 <- as.data.frame(read.csv(
   "./results/probe_pair/probe_pair_probmatch.csv",
-   header=TRUE,
-   stringsAsFactors = TRUE))
-                      
+  header=TRUE,
+  stringsAsFactors = TRUE))
+
 data <- rbind(data, data2)
 data <- rbind(data, data3)
 
 data <- data %>%
-        filter(n_given > 0)
+  filter(n_given > 0)
 
 data$pid <- paste(data$pid, data$given)
 data$correct_choice <- as.logical(data$correct_choice)
@@ -201,6 +222,6 @@ for (p in c("control", "AoA")){
 
 df_struccomp <- as.data.frame(
   cbind(n_givens, p_ctrl, t_ctrl, ci_ctrl_lo, ci_ctrl_hi, probe_c, comp)
-  )
+)
 df_struccomp$sig_bonferroni <- df_struccomp$p_ctrl < 0.05/length(p_ctrl)
 print(length(df_struccomp))

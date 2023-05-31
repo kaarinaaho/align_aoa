@@ -122,7 +122,7 @@ class SeqGenerator:
 
         for condition in self.sequence_types:
 
-            save_fp = os.path.join(save_folder, f"{condition}_sample_sequences.csv")
+            save_fp = os.path.join(save_folder, f"{condition}_sample_sequenceCODETEST.csv")
 
             # Initialise results file
             pd.DataFrame(
@@ -165,53 +165,26 @@ class SeqGenerator:
 if __name__ == "__main__":
 
     # Example
-    ___, ___, vocab1 = emb.embs_quickload(n_word_dim=50)
+    ___, ___, vocab = emb.embs_quickload(n_word_dim=50)
+
+    # Check for directories; make if not present
+    if not os.path.exists(
+        os.path.join(Path(__file__).parent.parent, "results"
+        )):
+        os.mkdir(os.path.join(Path(__file__).parent.parent, "results"))
+    
+    if not os.path.exists(
+        os.path.join(Path(__file__).parent.parent, "results/sample_sequences"
+        )):
+        os.mkdir(
+            os.path.join(
+                Path(__file__).parent.parent,
+                "results/sample_sequences"
+                ))
     
 
-    textfile = open(
-        "/Users/apple/Documents/GitHub/GloVe/experimental/multi_fold/enwik8_fixedsize_childessize/results/vocab/1.txt",
-        "r")
-    vocab2 = textfile.read().split('\n')
-    vocab2 = [x.split(" ")[0] for x in vocab2]
-
-    intersect_vocab_bigchildes = [x for x in vocab1 if x in vocab2]
-
-    """
-    textfile = open(
-        "/Users/apple/Documents/GitHub/GloVe/vocab_childes_all.txt",
-        "r")
-    vocab2 = textfile.read().split('\n')
-    vocab2 = [x.split(" ")[0] for x in vocab2]
-
-    intersect_vocab_smolchildes = [x for x in vocab1 if x in vocab2]
-    """
-
-    generator = SeqGenerator(intersect_vocab_bigchildes, sequence_types=["AoA", "controlIncAoA", "controlExcAoA"])
-
-    """
-    aoa = generator.aoa_data
-
-    Str = "Control concepts inc AoA: {}; Control concepts exc AoA: {}; AoA concepts: {}"
-
-    print("childes: ", Str.format(
-        len(intersect_vocab_bigchildes),
-        len([x for x in intersect_vocab_bigchildes if x not in list(aoa["concept_i"])]),
-        len([x for x in list(aoa["concept_i"]) if x in intersect_vocab_bigchildes])))
-
-    print("childes: ", Str.format(
-        len(intersect_vocab_smolchildes),
-        len([x for x in intersect_vocab_smolchildes if x not in list(aoa["concept_i"])]),
-        len([x for x in list(aoa["concept_i"]) if x in intersect_vocab_smolchildes])))
-
-
-    print("Adult: ", Str.format(
-        len(vocab1),
-        len([x for x in vocab1 if x not in list(aoa["concept_i"])]),
-        len([x for x in list(aoa["concept_i"]) if x in vocab1])))
-
-    """
-
+    generator = SeqGenerator(vocab, sequence_types=["AoA", "controlIncAoA", "controlExcAoA"])
     
-    generator.generate(save_folder="/Users/apple/Documents/GitHub/align_aoa/results/enwiki8_1",
+    generator.generate(save_folder=os.path.join(Path(__file__).parent.parent,"results/sample_sequences"),
                        n_sequences=100)
     

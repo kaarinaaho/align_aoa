@@ -134,3 +134,7 @@ assets/
 results/
 Untitled.ipynb
 python/Analysis_notebook_CHILDES.ipynb
+R/.Rapp.history
+.gitignore
+R/.Rhistory
+python/Analysis_notebook copy.ipynb

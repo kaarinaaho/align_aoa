@@ -159,13 +159,25 @@ class ProbePairExpt:
 if __name__ == "__main__":
 
     # Run probe pair experiment with child-directed embeddings - are the results replicated?
-    wdnimg, imgnwd, vocab1 = emb.embs_quickload(n_word_dim=50)
+    wdnimg, imgnwd, vocab = emb.embs_quickload(n_word_dim=50)
 
-    expt = ProbePairExpt(imgnwd, wdnimg, vocab1, vocab1)
+    if not os.path.exists(
+        os.path.join(Path(__file__).parent.parent, "results/probe_pair"
+        )):
+        os.mkdir(
+            os.path.join(
+                Path(__file__).parent.parent,
+                "results/probe_pair"
+                ))
+    
+
+    expt = ProbePairExpt(imgnwd, wdnimg, vocab, vocab)
     expt.run(
         os.path.join(
             Path(__file__).parent.parent,
-            "/Users/apple/Documents/GitHub/align_aoa/results/sample_sequences/{}_sequences.csv"),
-            "/Users/apple/Documents/GitHub/align_aoa/results/probe_pair/probe_pair_emp.csv",
-            ["AoA", "controlIncAoA", "controlExcAoA"]
+            "results/sample_sequences/{}_sequences.csv"),
+        os.path.join(
+            Path(__file__).parent.parent,
+            "results/probe_pair/probe_pair_emp.csv"),
+        ["AoA", "controlIncAoA", "controlExcAoA"]
     )

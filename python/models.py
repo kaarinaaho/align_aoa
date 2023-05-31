@@ -1250,14 +1250,10 @@ if __name__ == "__main__":
     model="optimal"
     restart=4
 
-    """python3 /home/kaarina/projects/age_of_acquisition/AoA_final/python/models.py --mode train --model optimal --restart 0"""
-
-
     var_list = [
         "degree_subs",
         "degree_full",
         "mean_dist_subs",
-        #"mean_dist_full",
         "min_dist_subs",
         "min_dist_full",
         "degree_skew_subs",

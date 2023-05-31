@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 sys.path.append(
     '/Users/apple/projects/Age_of_acquisition/python'
@@ -24,8 +25,8 @@ class FeatureGenerator:
         self.emb1 = emb1
         self.emb2 = emb2
         self.vocab = vocab
-        self.pw_1 = euclidean_distances(emb1)
-        self.pw_2 = euclidean_distances(emb2)
+        self.pw_1 = utils.scale_pw(euclidean_distances(emb1))
+        self.pw_2 = utils.scale_pw(euclidean_distances(emb2))
         
         graph1, graph2 = self._get_graphs(q)
         self.graph1 = graph1
@@ -56,9 +57,9 @@ class FeatureGenerator:
 
     def _get_modality_averages(self, df):
         # Get list of var names stripped of modality
-        agnostic = self._get_stripped_varnames(df, strip=["modality"])
+        agnostic = self._get_stripped_varnames(df)
 
-        # Get density at end
+        # Get density at 
         densities = [x for x in agnostic if "density" in x]
         agnostic = [x for x in agnostic if x not in densities]
         agnostic = agnostic + densities
@@ -162,7 +163,8 @@ class FeatureGenerator:
     def _generate_basic_graph_measures(self):
 
         var_names = ["min_deg_full", "max_deg_full", "mean_deg_full",
-                    "min_deg_subs", "max_deg_subs", "mean_deg_subs"]
+                    "min_deg_subs", "max_deg_subs", "mean_deg_subs",
+                    "deg_skew_full", "deg_skew_subs"]
 
         labs = dict(zip([0,1], ["_1", "_2"]))
 
@@ -193,6 +195,14 @@ class FeatureGenerator:
                         item_results += [np.min(np.sum(mat[idx, :][:, idx], axis=1))/len(idx)]
                         item_results += [np.max(np.sum(mat[idx, :][:, idx], axis=1))/len(idx)]
                         item_results += [np.mean(np.sum(mat[idx, :][:, idx], axis=1))/len(idx)]
+
+                        # Skews (of full distances and subs distances)
+                        item_results += [
+                            (((item_results[5] - item_results[3])/(item_results[4] - item_results[3]))-0.5)/0.5
+                            ]
+                        item_results += [
+                            (((item_results[8] - item_results[6])/(item_results[7] - item_results[6]))-0.5)/0.5
+                            ]
 
                         col_names = col_names + [x + str(labs[i]) for x in var_names]
                     
@@ -365,64 +375,52 @@ class FeatureGenerator:
 if __name__ == "__main__":
 
     control_seqs_exc = pd.read_csv(
-            "/Users/apple/Documents/GitHub/align_aoa/results/sample_sequences/controlExcAoA_sequences.csv",
+        os.path.join(
+            Path(__file__).parent.parent,
+            "results/sample_sequences/controlExcAoA_sequences.csv"
+            ),
             header=0, index_col=0
     )
-
 
     aoa_seqs = pd.read_csv(
-            "/Users/apple/Documents/GitHub/align_aoa/results/sample_sequences/AoA_sequences.csv",
-            header=0, index_col=0
-        )
-
-    """
-    control_seqs_inc = pd.read_csv(
-        "/Users/apple/projects/Age_of_acquisition/assets/sample_sequences/CHILDES/controlIncAoA_sequences_CHILDES_stories_cbt_switch.csv",
+        os.path.join(
+            Path(__file__).parent.parent,
+            "results/sample_sequences/AoA_sequences.csv"
+            ),
             header=0, index_col=0
     )
-    """
+
+    if not os.path.exists(
+        os.path.join(Path(__file__).parent.parent, "results/seq_features"
+        )):
+        os.mkdir(
+            os.path.join(
+                Path(__file__).parent.parent,
+                "results/seq_features"
+                ))
 
     seqs = pd.concat([
         aoa_seqs,
-        #control_seqs_inc
         control_seqs_exc
         ])
 
-    emb1_idxed, emb2_idxed, intersect_vocab = emb.embs_quickload(n_word_dim=50)
-
-    """
-    __, emb1, vocab1 = emb.embs_quickload(n_word_dim=50)
-
-
-    emb2 = np.loadtxt(
-    "/Users/apple/Documents/GitHub/GloVe/vectors_fullchildesandstoriesandcbtandswitchboard.txt",
-    usecols = [x for x in range(1,50)]
-    )
-
-    textfile = open(
-    "/Users/apple/Documents/GitHub/GloVe/vocab_fullchildesandstoriesandcbtandswitchboard.txt",
-    "r")
-    vocab2 = textfile.read().split('\n')
-    vocab2 = [x.split(" ")[0] for x in vocab2]
-
-    # Get vocab of items in intersection between embeddings
-    intersect_vocab = [x for x in vocab1 if x in vocab2]
-    idx1 = [vocab1.index(x) for x in intersect_vocab]
-    idx2 = [vocab2.index(x) for x in intersect_vocab]
-
-    # Reindex embeddings s.t they align
-    emb1_idxed = emb1[idx1]
-    emb2_idxed = emb2[idx2]
-    """
+    emb1, emb2, vocab = emb.embs_quickload(n_word_dim=50)
 
     feature_gen = FeatureGenerator(
-        emb1_idxed, emb2_idxed, intersect_vocab, seqs
+        emb1, emb2, vocab, seqs
         )
-    """
+    
     feature_gen.generate_non_nx_measures(
-        "/Users/apple/Documents/GitHub/align_aoa/assets/sample_mets/childes_moredata_non_nx.csv"
+        os.path.join(
+                Path(__file__).parent.parent,
+                "results/seq_features/sequence_non_nx_mets_monthwise.csv"
+                )
     )
     """
     feature_gen.generate_nx_measures(
-        "/Users/apple/Documents/GitHub/align_aoa/results/seq_features/sequence_nx_mets_monthwise.csv"
+                os.path.join(
+                Path(__file__).parent.parent,
+                "results/seq_features/sequence_nx_mets_monthwise.csv"
+                )
     )
+    """
